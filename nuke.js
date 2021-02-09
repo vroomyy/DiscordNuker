@@ -17,7 +17,10 @@ if(guild === null || guild === undefined){
     console.error("Invalid Guild ID");
     throw new Error();
 }
-
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+               
 function FindModule(item)
 {
     var req = window.webpackJsonp.push([[], {'__extra_id__': (module, exports, req) => module.exports = req}, [['__extra_id__']]]);
@@ -117,31 +120,43 @@ function RemoveAllChannels()
     });
 }
 
-function goodbyemembers(){
-    var memberList = FindModule("getMembers").getMembers(guildID);
-    memberList.reverse();
+    function goodbyemembers(){
+        var memberList = FindModule("getMembers").getMembers(guildID);
+        memberList.reverse();
 
-    memberList.forEach(member => {
+        memberList.forEach(member => {
 
-        if(member.userId == FindModule("getCurrentUser").getCurrentUser().id) return;
+            if(member.userId == FindModule("getCurrentUser").getCurrentUser().id) return;
 
-        if(banmembers)
-        {
-            try {
-                FindModule("banUser").banUser(guildID, member.userId);
+            if(banmembers)
+            {
+                try {
+                    FindModule("banUser").banUser(guildID, member.userId).then(resp => {
+                    if(resp.ok === false){                
+                        console.log(`waiting ${resp.retry_after}ms`);
+                        sleep(resp.retry_after);
+                        FindModule("banUser").banUser(guildID, member.userId);
+                    }
+                })
+                }
+                catch(err){}
             }
-            catch(err){}
-        }
-        else if(kickmembers)
-        {
-            try {
-                FindModule("kickUser").kickUser(guildID, member.userId);
+            else if(kickmembers)
+            {
+                try {
+                    FindModule("kickUser").kickUser(guildID, member.userId).then(resp => {
+                    if(resp.ok === false){                    
+                        console.log(`waiting ${resp.retry_after}ms`);
+                        sleep(resp.retry_after);
+                        FindModule("kickUser").kickUser(guildID, member.userId);
+                    }
+                })
+                }
+                catch(err){}
             }
-            catch(err){}
-        }
-    });
+        });
 
-}
+    }
 
 function getData(url, callback) {
     var xhr = new XMLHttpRequest();
