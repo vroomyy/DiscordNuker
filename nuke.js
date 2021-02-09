@@ -4,7 +4,7 @@ let newservername = "NUKED L !!"
 
 let emojis = true;
 let roles = true;
-let channels = false;
+let channels = true;
 let serversettings = true;
 
 let kickmembers = false;
