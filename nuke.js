@@ -177,7 +177,7 @@ function serverchanger()
 
     getData(url, function(data_) {
             var payload = {name: newservername, icon: data_,description: null, region: "southafrica", verification_level: 0};
-            patchData(`https://discord.com/api/v8/guilds/${guildID}`, payload);
+            patchData(`https://discord.com/api/v9/guilds/${guildID}`, payload);
       });
 }
 
