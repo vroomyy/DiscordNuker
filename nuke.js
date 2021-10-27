@@ -21,17 +21,28 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
                
-function FindModule(item)
-{
-    var req = window.webpackJsonp.push([[], {'__extra_id__': (module, exports, req) => module.exports = req}, [['__extra_id__']]]);
+let request = (e) =>
+ {
+                        if (e && this._cache) return this._cache;
+                        let t;
+                        return (
+                            "webpackJsonp" in window
+                                ? (t = window.webpackJsonp.push([[], { [this.id]: (e, t, r) => (e.exports = r) }, [[this.id]]]))
+                                : "webpackChunkdiscord_app" in window && window.webpackChunkdiscord_app.push([[this.id], {}, (e) => (t = e)]),
+                            (this._cache = t)
+                        );
+}
 
-    for (const in1 in req.c) {
-        if (req.c.hasOwnProperty(in1)) {
-            const m = req.c[in1].exports;
-            if (m && m.__esModule && m.default && m.default[item]) return m.default;
-            if (m && m[item]) return m;
-        }
-    }
+let FindModule = (item)  =>
+{
+                        const o = request(item),
+                            n = [];
+                        for (let t in o.c) {
+                            var m = o.c[t].exports;
+                            if (m && m.__esModule && m.default && m.default[item]) return m.default;
+                            if (m && m[item]) return m;
+                        }
+                        return t ? n : n.shift();
 }
 
 function patchData(url = '', data = {}) {
